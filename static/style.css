@@ -1,0 +1,110 @@
+/* General styling */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #FFF8E7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container holds form + image side by side */
+.container {
+    display: flex;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 900px;
+    width: 90%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Form section */
+.left-form {
+    flex: 1;
+    padding-right: 30px;
+}
+
+.right-image {
+    flex: 1;
+    text-align: center;
+}
+
+.right-image img {
+    width: 250px;
+}
+
+/* Titles */
+h1 {
+    font-size: 32px;
+    color: #2F2F2F;
+    margin-bottom: 10px;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-style: normal;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #2F2F2F;
+}
+
+/* Input fields */
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #ffffff;
+    font-weight: normal;
+    color: #2F2F2F;
+}
+
+/* Placeholder text styling */
+::placeholder {
+    color: #888;
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Button styling */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #6DA9E4;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #4D87CC;
+}
+
+/* Bottom link */
+.forgot {
+    margin-top: 10px;
+    color: #2F2F2F;
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+/* Link */
+a {
+    color: #00008B;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

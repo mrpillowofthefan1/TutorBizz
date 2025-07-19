@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TutorBizz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% include "nav.html" %}
+    <div class="container">
+        <div class="left-form">
+            <h1 class="word">Login</h1>
+
+            <form action="{{ url_for('login') }}" method="post">
+                {% if msg %}
+                    <div class="message">{{ msg }}</div>
+                {% endif %}
+
+                <input class="textbox" type="text" name="username" placeholder="Username" required>
+                <input class="textbox" type="password" name="password" placeholder="Password" required>
+
+                <button class="btn" type="submit">Login</button>
+            </form>
+
+            <p class="bottom">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+            <p class="bottom">Forgot password? <a href="{{ url_for('forgot') }}">Reset</a></p>
+        </div>
+
+        <div class="right-image">
+            <img src="{{ url_for('static', filename='LOGO.JPG') }}" alt="Bee Mascot">
+        </div>
+    </div>
+
+</body>
+</html>
