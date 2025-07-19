@@ -1,0 +1,41 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #FFF8E7;
+}
+
+/* Navbar background */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #FFF8E7; /* Custom blue */
+  z-index: 1000;
+  padding: 0.75rem 1rem;
+}
+
+/* Brand / logo text */
+.navbar-brand {
+  font-weight: bold;
+  color: #FFF8E7 !important;
+  font-size: 1.5rem;
+}
+
+/* Navigation links */
+.nav-link {
+  color: #000000 !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.nav-link:hover {
+  color: #FFD369 !important;
+}
+
+/* Active link */
+.nav-item.active .nav-link {
+  border-bottom: 2px solid #FFD369;
+  font-weight: bold;
+  color: #FFD369 !important;
+}
