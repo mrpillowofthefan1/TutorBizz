@@ -1,4 +1,3 @@
-/* General styling */
 body {
     font-family: 'Segoe UI', sans-serif;
     background-color: #f8f0d8;
@@ -9,59 +8,24 @@ body {
     margin: 0;
 }
 
-/* Container holds form + image side by side */
 .container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     background-color: #ffffff;
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     padding: 40px;
-    max-width: 900px;
+    max-width: 500px;
     width: 90%;
-    align-items: center;
-    justify-content: space-between;
 }
 
-/* Form section */
-.left-form {
-    flex: 1;
-    padding-right: 30px;
-}
-
-/* Image section */
-.right-image {
-    flex: 1;
-    text-align: center;
-}
-
-.right-image img {
-    width: 250px;
-}
-
-/* Headings */
 h1 {
     font-size: 32px;
     color: #2F2F2F;
-    margin-bottom: 10px;
-    background: none;
-    padding: 0;
-    border-radius: 0;
-    font-style: normal;
-}
-
-h2 {
-    font-size: 24px;
     margin-bottom: 20px;
-    color: #2F2F2F;
-}
-.rword{
-    position: absolute;
-    bottom: 550px;
-    left: 600px;
-    margin-bottom: 40px;
 }
 
-/* Input fields */
 input[type="text"],
 input[type="password"],
 input[type="email"] {
@@ -69,59 +33,47 @@ input[type="email"] {
     padding: 12px;
     margin: 10px 0;
     border: 1px solid #ccc;
-
     border-radius: 10px;
     background-color: #ffffff;
     font-weight: normal;
     color: #2F2F2F;
 }
 
-/* Placeholder styling */
 ::placeholder {
     color: #888;
     font-weight: normal;
     font-style: normal;
 }
 
-/* Button styling */
 button {
     width: 100%;
     padding: 12px;
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 10px;
-    background-color: #A0C4FF; /* Light blue */
-    color: #2F2F2F; /* Dark text for contrast */
+    background-color: #4D87CC;
+    color: white;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 button:hover {
-    background-color: #4D87CC; /* Darker blue on hover */
-    color: white;
+    background-color: #FFC107;
+    color: black;
 }
 
-/* Forgot password link */
-.forgot {
-    margin-top: 10px;
+.textboxreg {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #ffffff;
+    font-weight: normal;
     color: #2F2F2F;
-    font-size: 14px;
-    text-decoration: underline;
 }
 
-/* Links */
-a {
-    color: #00008B;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* Navbar */
 .navbar {
     position: fixed;
     top: 0;
@@ -135,14 +87,12 @@ a:hover {
     align-items: center;
 }
 
-/* Brand logo/text */
 .navbar-brand {
     font-weight: bold;
     color: #2F2F2F;
     font-size: 1.5rem;
 }
 
-/* Navigation links */
 .nav-link {
     color: #000000;
     font-weight: 500;
@@ -150,12 +100,10 @@ a:hover {
     margin-left: 1rem;
 }
 
-/* Hover effect */
 .nav-link:hover {
     color: #FFD369 !important;
 }
 
-/* Active nav item */
 .nav-item.active .nav-link {
     border-bottom: 2px solid #FFD369;
     font-weight: bold;

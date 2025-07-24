@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='register.css') }}">
     <title>Register</title>
 </head>
 <body>
-
-    <div class="container">  <!-- Wrapper for form -->
-        <h2 class="word">Register</h2>
-
+    {% include "nav.html" %}
+    <div class="container">
+        <h1>Create your Account</h1>
         <form action="{{ url_for('register') }}" method="post">
             <div>{{ msg }}</div>
-
-            <input class="textbox" type="text" name="username" placeholder="Enter Username" required>
-            <input class="textbox" type="password" name="password" placeholder="Enter Password" required>
-            <input class="textbox" type="email" name="email" placeholder="Enter Email" required>
-
-            <button class="btn" type="submit">Register</button>
+            <input class="textboxreg" name="username" placeholder="Enter Username" required>
+            <input class="textboxreg" name="password" placeholder="Enter Password" required>
+            <input class="textboxreg" name="email" placeholder="Enter Email" required>
+            <button class="btn" type="submit">Sign Up</button>
+            <style>
+                    .btn{
+                        background-color: #4D87CC;
+                    }
+                    .btn:hover {
+                        background-color: #FFC107;
+                        color: black;
+                    }
+                </style>
         </form>
-
-        <p class="bottom">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
     </div>
-
 </body>
 </html>

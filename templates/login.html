@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | TutorBizz</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     {% include "nav.html" %}
@@ -19,8 +19,17 @@
 
                 <input class="textbox" type="text" name="username" placeholder="Username" required>
                 <input class="textbox" type="password" name="password" placeholder="Password" required>
-
                 <button class="btn" type="submit">Login</button>
+                <style>
+                    .btn{
+                        background-color: #4D87CC;
+                    }
+                    .btn:hover {
+                        background-color: #FFC107;
+                        color: black;
+                    }
+                </style>
+
             </form>
 
             <p class="bottom">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>

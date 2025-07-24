@@ -5,20 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password | TutorBizz</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .rstbtn {
+            background-color: #4D87CC;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .rstbtn:hover {
+            background-color: #FFC107;
+            color: black;
+        }
+    </style>
 </head>
 <body>
 
     <div class="container">
         <div class="left-form">
-            <h1 class="word">TutorBizz</h1>
+            <h1 class="word">Forgot Password</h1>
 
-            <form action="{{ url_for('login') }}" method="post">
+            <form action="{{ url_for('forgot') }}" method="post">
                 {% if msg %}
                     <div class="message">{{ msg }}</div>
                 {% endif %}
 
-                <input class="textbox" type="text" name="username" placeholder="Enter Email" required>
-
+                <input class="textbox" type="text" name="email" placeholder="Enter Email" required>
                 <button class="rstbtn" type="submit">Reset</button>
             </form>
 

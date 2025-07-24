@@ -1,20 +1,32 @@
 import re
-
 import MySQLdb.cursors
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
+from flask_mail import Mail
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+# MySQL Configuration
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''  # Enter your MySql password
+app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'tutorbizz'
 
+# Mail Configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'yourId@gmail.com'
+app.config['MAIL_PASSWORD'] = '*****'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+mail = Mail(app)
 mysql = MySQL(app)
 
 @app.route('/')
+def home():
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -32,7 +44,6 @@ def login():
             return render_template('index.html', msg='Logged in successfully!')
         else:
             msg = 'Incorrect username/password!'
-
     return render_template('login.html', msg=msg)
 
 @app.route('/logout')
@@ -61,15 +72,27 @@ def register():
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
-            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email))
-            mysql.connection.commit()
-            msg = 'You have successfully registered!'
+            try:
+                cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email))
+                mysql.connection.commit()
+                msg = 'You have successfully registered!'
+            except MySQLdb.IntegrityError:
+                msg = 'Username already taken!'
     return render_template('register.html', msg=msg)
+
 @app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
-    step = session.get('step', )
-    return render_template('forgot.html')
-
+    msg = ''
+    if request.method == 'POST' and 'email' in request.form:
+        email = request.form['email']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM accounts WHERE email = %s', (email,))
+        account = cursor.fetchone()
+        if account:
+            msg = 'Reset link sent to your email (not really, just a placeholder)!'
+        else:
+            msg = 'Email does not exist!'
+    return render_template('forgot.html', msg=msg)
 
 if __name__ == '__main__':
     app.run(debug=True)
