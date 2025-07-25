@@ -1,8 +1,9 @@
 import re
+import random
 import MySQLdb.cursors
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
-from flask_mail import Mail
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -16,8 +17,8 @@ app.config['MYSQL_DB'] = 'tutorbizz'
 # Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'yourId@gmail.com'
-app.config['MAIL_PASSWORD'] = '*****'
+app.config['MAIL_USERNAME'] = 'h8642639@gmail.com'
+app.config['MAIL_PASSWORD'] = 'bjrw wcmz iorv uuqk'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -48,10 +49,20 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('loggedin', None)
-    session.pop('id', None)
-    session.pop('username', None)
+    session.clear()
     return redirect(url_for('login'))
+
+def mail_send(email_address):
+    random_code = random.randrange(10 ** 9, 10 ** 10)
+    session['reset_code'] = str(random_code)
+    msg = Message(
+        'Password Reset Code',
+        sender='h8642639@gmail.com',
+        recipients=[email_address]
+    )
+    msg.body = f"Your verification code is: {random_code}"
+    mail.send(msg)
+    return 'Sent'
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -72,12 +83,9 @@ def register():
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
-            try:
-                cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email))
-                mysql.connection.commit()
-                msg = 'You have successfully registered!'
-            except MySQLdb.IntegrityError:
-                msg = 'Username already taken!'
+            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email))
+            mysql.connection.commit()
+            msg = 'You have successfully registered!'
     return render_template('register.html', msg=msg)
 
 @app.route('/forgot', methods=['GET', 'POST'])
@@ -89,10 +97,42 @@ def forgot():
         cursor.execute('SELECT * FROM accounts WHERE email = %s', (email,))
         account = cursor.fetchone()
         if account:
-            msg = 'Reset link sent to your email (not really, just a placeholder)!'
+            session['reset_email'] = email
+            mail_send(email)
+            return render_template('forgot2.html', msg='Verification code sent to your email.')
         else:
             msg = 'Email does not exist!'
     return render_template('forgot.html', msg=msg)
+
+@app.route('/forgot2', methods=['GET', 'POST'])
+def forgot2():
+    msg = ''
+    if request.method == 'POST' and 'vercode' in request.form:
+        vercode = request.form['vercode'].strip()
+        if vercode == session.get('reset_code'):
+            return render_template('forgot3.html')
+        else:
+            msg = 'Code doesn\'t match!'
+    return render_template('forgot2.html', msg=msg)
+
+@app.route('/forgot3', methods=['GET', 'POST'])
+def forgot3():
+    msg = ''
+    if request.method == 'POST' and 'newpassword' in request.form:
+        newpassword = request.form['newpassword']
+        email = session.get('reset_email')
+        if not newpassword:
+            msg = 'Password is required!'
+        elif email:
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('UPDATE accounts SET password = %s WHERE email = %s', (newpassword, email))
+            mysql.connection.commit()
+            session.pop('reset_email', None)
+            session.pop('reset_code', None)
+            return render_template('login.html', msg='Password reset successful. You may now log in.')
+        else:
+            msg = 'Session expired. Please try again.'
+    return render_template('forgot3.html', msg=msg)
 
 if __name__ == '__main__':
     app.run(debug=True)

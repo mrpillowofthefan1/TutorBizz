@@ -31,12 +31,12 @@
         <div class="left-form">
             <h1 class="word">Forgot Password</h1>
 
-            <form action="{{ url_for('forgot') }}" method="post">
+            <form action="{{ url_for('forgot2') }}" method="post">
                 {% if msg %}
                     <div class="message">{{ msg }}</div>
                 {% endif %}
 
-                <input class="textbox" type="text" name="email" placeholder="Enter Email" required>
+                <input class="textbox" type="text" name="vercode" placeholder="Enter Verification Code" required>
                 <button class="rstbtn" type="submit">Continue</button>
             </form>
 

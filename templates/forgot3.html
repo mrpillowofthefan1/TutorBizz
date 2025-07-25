@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='register.css') }}">
+    <title>Register</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Create your Account</h1>
+        <form action="{{ url_for('forgot3') }}" method="post">
+            {% if msg %}
+                <div class="message">{{ msg }}</div>
+            {% endif %}
+            <input class="textboxreg" name="newpassword" placeholder="Enter the new Password" required>
+            <button class="btn" type="submit">Confirm</button>
+            <style>
+                    .btn{
+                        background-color: #4D87CC;
+                    }
+                    .btn:hover {
+                        background-color: #FFC107;
+                        color: black;
+                    }
+                </style>
+        </form>
+    </div>
+</body>
+</html>
