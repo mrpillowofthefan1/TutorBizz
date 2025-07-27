@@ -36,11 +36,16 @@
       <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
         <a class="nav-link" href="{{ url_for('forgot') }}">Reset Password</a>
       </li>
+
       {% if session.get('loggedin') %}
+      <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('checkout') }}">Checkout</a>
+      </li>
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
       </li>
       {% endif %}
+
     </ul>
   </div>
 </nav>

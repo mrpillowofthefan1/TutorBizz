@@ -1,10 +1,16 @@
 import re
 import random
 import MySQLdb.cursors
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mysqldb import MySQL
 from flask_mail import Mail, Message
+import stripe
 
+# Stripe Configuration
+stripe.api_key = 'sk_test_51RofqsRxn8ni2a1RF4Bqle3Ejj2smfnxZr9nMbAiIhwiwpLztqTB0UcQsSSRXKA5EnMTQPIwF8gckEMpqV7fQKoa00HwWuoqVR'
+YOUR_DOMAIN = 'http://localhost:5000'
+
+# Flask App Initialization
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
@@ -22,6 +28,7 @@ app.config['MAIL_PASSWORD'] = 'bjrw wcmz iorv uuqk'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
+# Extensions Initialization
 mail = Mail(app)
 mysql = MySQL(app)
 
@@ -55,11 +62,7 @@ def logout():
 def mail_send(email_address):
     random_code = random.randrange(10 ** 9, 10 ** 10)
     session['reset_code'] = str(random_code)
-    msg = Message(
-        'Password Reset Code',
-        sender='h8642639@gmail.com',
-        recipients=[email_address]
-    )
+    msg = Message('Password Reset Code', sender='h8642639@gmail.com', recipients=[email_address])
     msg.body = f"Your verification code is: {random_code}"
     mail.send(msg)
     return 'Sent'
@@ -133,6 +136,33 @@ def forgot3():
         else:
             msg = 'Session expired. Please try again.'
     return render_template('forgot3.html', msg=msg)
+
+@app.route('/checkout')
+def checkout():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    return render_template('checkout.html')
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    try:
+        session_obj = stripe.checkout.Session.create(
+            ui_mode='embedded',
+            line_items=[{
+                'price': 'price_1Rog4ERxn8ni2a1RKEYKgApk',
+                'quantity': 1,
+            }],
+            mode='payment',
+            return_url=YOUR_DOMAIN + '/return.html?session_id={CHECKOUT_SESSION_ID}'
+        )
+        return jsonify(clientSecret=session_obj.client_secret)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/session-status', methods=['GET'])
+def session_status():
+    session_obj = stripe.checkout.Session.retrieve(request.args.get('session_id'))
+    return jsonify(status=session_obj.status, customer_email=session_obj.customer_details.email)
 
 if __name__ == '__main__':
     app.run(debug=True)
