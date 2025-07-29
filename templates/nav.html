@@ -17,7 +17,7 @@
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg w-100">
-  <a class="navbar-brand" href="{{ url_for('login') }}"><img src="{{ url_for('static', filename='sidelogo.png') }}" width="100" height="100"></a>
+  <a class="navbar-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='sidelogo.png') }}" width="100" height="100"></a>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse"
           data-target="#navbarNav" aria-controls="navbarNav"
@@ -27,6 +27,20 @@
 
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ml-auto">
+        <li class="nav-item {% if request.endpoint == 'homepage' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+      </li>
+      {% if session.get('loggedin') %}
+      <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('checkout') }}">Practice</a>
+      </li>
+      <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('checkout') }}">Checkout</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+      </li>
+      {% else %}
       <li class="nav-item {% if request.endpoint == 'login' %}active{% endif %}">
         <a class="nav-link" href="{{ url_for('login') }}">Sign In</a>
       </li>
@@ -35,14 +49,6 @@
       </li>
       <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
         <a class="nav-link" href="{{ url_for('forgot') }}">Reset Password</a>
-      </li>
-
-      {% if session.get('loggedin') %}
-      <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
-        <a class="nav-link" href="{{ url_for('checkout') }}">Checkout</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
       </li>
       {% endif %}
 

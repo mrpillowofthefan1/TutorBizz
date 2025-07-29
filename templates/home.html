@@ -2,9 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home | TutorBizz</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css') }}">
 </head>
 <body>
-{% include "nav.html" %}
+  {% include "nav.html" %}
+
+  <div class="main-container">
+    <div class="left-image">
+      <img src="{{ url_for('static', filename='sidelogo.png') }}" alt="Bee Mascot">
+    </div>
+
+    <div class="hero-text">
+      <h1 class="title">Learn, <br>Practice, <br>Succeed</h1>
+      <p class="subtitle">Find excellent resources to enhance your practice</p>
+        <a href="{{ url_for('login') }}">
+            <button class="btn" type="button">Get Started</button>
+        </a>
+        <style>
+                    .btn{
+                        background-color: #4D87CC;
+                        height: 50px;
+                        width: 150px;
+                        border-radius: 15px;
+                    }
+                    .btn:hover {
+                        background-color: #FFC107;
+                        color: black;
+                    }
+                </style>
+    </div>
+  </div>
 </body>
 </html>

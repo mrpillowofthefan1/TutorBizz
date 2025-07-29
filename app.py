@@ -6,21 +6,17 @@ from flask_mysqldb import MySQL
 from flask_mail import Mail, Message
 import stripe
 
-# Stripe Configuration
 stripe.api_key = 'sk_test_51RofqsRxn8ni2a1RF4Bqle3Ejj2smfnxZr9nMbAiIhwiwpLztqTB0UcQsSSRXKA5EnMTQPIwF8gckEMpqV7fQKoa00HwWuoqVR'
 YOUR_DOMAIN = 'http://localhost:5000'
 
-# Flask App Initialization
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# MySQL Configuration
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'tutorbizz'
 
-# Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'h8642639@gmail.com'
@@ -28,13 +24,15 @@ app.config['MAIL_PASSWORD'] = 'bjrw wcmz iorv uuqk'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
-# Extensions Initialization
 mail = Mail(app)
 mysql = MySQL(app)
 
 @app.route('/')
 def home():
-    return redirect(url_for('login'))
+    return redirect(url_for('homepage'))
+@app.route('/home')
+def homepage():
+    return render_template('home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
