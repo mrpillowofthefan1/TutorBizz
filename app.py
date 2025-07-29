@@ -1,26 +1,34 @@
+import os
 import re
 import random
+from dotenv import load_dotenv  # Load .env variables
 import MySQLdb.cursors
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mysqldb import MySQL
 from flask_mail import Mail, Message
 import stripe
 
-stripe.api_key = 'sk_test_51RofqsRxn8ni2a1RF4Bqle3Ejj2smfnxZr9nMbAiIhwiwpLztqTB0UcQsSSRXKA5EnMTQPIwF8gckEMpqV7fQKoa00HwWuoqVR'
+# Load environment variables from .env
+load_dotenv()
+
+# Set Stripe API key from .env
+stripe.api_key = os.environ['STRIPE_API_KEY']
 YOUR_DOMAIN = 'http://localhost:5000'
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+# MySQL Config
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'tutorbizz'
+app.config['MYSQL_DB'] = os.environ['DB_NAME']
 
+# Mail Config
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'h8642639@gmail.com'
-app.config['MAIL_PASSWORD'] = 'bjrw wcmz iorv uuqk'
+app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -30,6 +38,7 @@ mysql = MySQL(app)
 @app.route('/')
 def home():
     return redirect(url_for('homepage'))
+
 @app.route('/home')
 def homepage():
     return render_template('home.html')
