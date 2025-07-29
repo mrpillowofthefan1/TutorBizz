@@ -1,30 +1,26 @@
 import os
 import re
 import random
-from dotenv import load_dotenv  # Load .env variables
+from dotenv import load_dotenv
 import MySQLdb.cursors
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mysqldb import MySQL
 from flask_mail import Mail, Message
 import stripe
 
-# Load environment variables from .env
 load_dotenv()
 
-# Set Stripe API key from .env
 stripe.api_key = os.environ['STRIPE_API_KEY']
 YOUR_DOMAIN = 'http://localhost:5000'
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# MySQL Config
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = os.environ['DB_NAME']
 
-# Mail Config
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'h8642639@gmail.com'
