@@ -1,10 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+{% include "nav.html" %}
+{% block content %}
+<div class="container mt-5">
+  <div class="text-center">
+    <h2>Welcome!</h2>
+    <p class="lead">Choose an action to get started:</p>
+  </div>
 
+  <div class="row text-center mt-4">
+    <div class="col-md-4 mb-3">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Practice Questions</h5>
+          <p class="card-text">Work on unlimited SAT-style questions.</p>
+          <a href="{{ url_for('checkout') }}" class="btn btn-warning">Start Practicing</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Checkout</h5>
+          <p class="card-text">Upgrade to premium for full access.</p>
+          <a href="{{ url_for('checkout') }}" class="btn btn-info">Go to Checkout</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Account</h5>
+          <p class="card-text">Manage your account or logout.</p>
+          <a href="{{ url_for('logout') }}" class="btn btn-danger">Log Out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 </body>
 </html>

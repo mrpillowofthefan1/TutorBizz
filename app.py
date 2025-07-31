@@ -39,6 +39,12 @@ def home():
 def homepage():
     return render_template('home.html')
 
+
+@app.route('/lhome', methods=['GET', 'POST'])
+def loggedhome():
+    return render_template('lhome.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     msg = ''
@@ -52,7 +58,7 @@ def login():
             session['loggedin'] = True
             session['id'] = account['id']
             session['username'] = account['username']
-            return render_template('index.html', msg='Logged in successfully!')
+            return render_template('lhome.html', msg= username)
         else:
             msg = 'Incorrect username/password!'
     return render_template('login.html', msg=msg)
