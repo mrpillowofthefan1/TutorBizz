@@ -39,11 +39,9 @@ def home():
 def homepage():
     return render_template('home.html')
 
-
 @app.route('/lhome', methods=['GET', 'POST'])
 def loggedhome():
     return render_template('lhome.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
