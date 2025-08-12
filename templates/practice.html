@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='quiz.css') }}">
 </head>
 <body>
+    {% include "nav.html" %}
     <div class="quiz-container">
         <h2 id="question">Loading question...</h2>
         <div id="options"></div>
