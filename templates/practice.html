@@ -2,28 +2,53 @@
 <html>
 <head>
     <title>AI SAT Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='quiz.css') }}">
 </head>
 <body>
-    <h2 id="question">Loading question...</h2>
-    <div id="options"></div>
-    <button onclick="loadQuestion()">Next Question</button>
-
+    <div class="quiz-container">
+        <h2 id="question">Loading question...</h2>
+        <div id="options"></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <button id="next-btn" class="next-btn" onclick="loadQuestion()">Next Question</button>
+    </div>
     <script>
+        let isLoading = false;
+        let cooldownTime = 2000;
         async function loadQuestion() {
-            const res = await fetch("/get_question");
-            const data = await res.json();
-
-            document.getElementById("question").textContent = data.q;
-            const optionsDiv = document.getElementById("options");
-            optionsDiv.innerHTML = "";
-            data.options.forEach(opt => {
-                const btn = document.createElement("button");
-                btn.textContent = opt;
-                btn.onclick = () => alert(opt === data.answer ? "✅ Correct!" : `❌ Wrong. Answer: ${data.answer}`);
-                optionsDiv.appendChild(btn);
-            });
+            if (isLoading) return;
+            isLoading = true;
+            startLoadingBar();
+            try {
+                const res = await fetch("/get_question");
+                const data = await res.json();
+                document.getElementById("question").textContent = data.q;
+                const optionsDiv = document.getElementById("options");
+                optionsDiv.innerHTML = "";
+                data.options.forEach(opt => {
+                    const btn = document.createElement("button");
+                    btn.textContent = opt;
+                    btn.onclick = () => alert(opt === data.answer ? "✅ Correct!" : `❌ Wrong. Answer: ${data.answer}`);
+                    optionsDiv.appendChild(btn);
+                });
+            } catch (err) {
+                document.getElementById("question").textContent = "⚠️ Error loading question";
+            }
+            setTimeout(() => {
+                isLoading = false;
+                resetLoadingBar();
+            }, cooldownTime);
         }
-
+        function startLoadingBar() {
+            const bar = document.getElementById("progress-bar");
+            bar.style.width = "0%";
+            setTimeout(() => { bar.style.width = "100%"; }, 50);
+        }
+        function resetLoadingBar() {
+            const bar = document.getElementById("progress-bar");
+            bar.style.width = "0%";
+        }
         loadQuestion();
     </script>
 </body>

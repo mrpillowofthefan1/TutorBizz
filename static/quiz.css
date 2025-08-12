@@ -1,0 +1,77 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f0d8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.quiz-container {
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 700px;
+    width: 90%;
+    text-align: center;
+}
+#question {
+    font-size: 24px;
+    color: #2F2F2F;
+    margin-bottom: 30px;
+}
+#options button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #A0C4FF;
+    color: #2F2F2F;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
+}
+#options button:hover {
+    background-color: #4D87CC;
+    color: white;
+    transform: scale(1.02);
+}
+.next-btn {
+    padding: 12px 20px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: #FFD369;
+    color: #2F2F2F;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+.next-btn:hover {
+    background-color: #e6b93d;
+    transform: scale(1.05);
+}
+.progress-container {
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+    height: 8px;
+    width: 100%;
+}
+.progress-bar {
+    height: 100%;
+    background-color: #FFD369;
+    width: 0%;
+    transition: width 2s linear;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+#question, #options button {
+    animation: fadeIn 0.3s ease;
+}
