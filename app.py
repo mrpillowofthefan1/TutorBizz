@@ -1,6 +1,10 @@
 import os
 import re
 import random
+import json
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+
 from dotenv import load_dotenv
 import MySQLdb.cursors
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
@@ -16,11 +20,13 @@ YOUR_DOMAIN = 'http://localhost:5000'
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+# MySQL Config
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = os.environ['DB_NAME']
 
+# Mail Config
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'h8642639@gmail.com'
@@ -28,8 +34,10 @@ app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
+# Initialize services
 mail = Mail(app)
 mysql = MySQL(app)
+executor = ThreadPoolExecutor(max_workers=4)
 
 @app.route('/')
 def home():
@@ -56,7 +64,7 @@ def login():
             session['loggedin'] = True
             session['id'] = account['id']
             session['username'] = account['username']
-            return render_template('lhome.html', msg= username)
+            return render_template('lhome.html', msg=username)
         else:
             msg = 'Incorrect username/password!'
     return render_template('login.html', msg=msg)
@@ -170,6 +178,89 @@ def create_checkout_session():
 def session_status():
     session_obj = stripe.checkout.Session.retrieve(request.args.get('session_id'))
     return jsonify(status=session_obj.status, customer_email=session_obj.customer_details.email)
+
+# ===== AI Question Generator =====
+async def _generate_sat_question_async():
+    """Generates an SAT question using the Gemini API."""
+    prompt = """
+    Create an SAT-style question with a clear question, four options, and a single correct answer.
+    The question should be in one of the SAT subjects: Reading, Writing and Language, or Math.
+    """
+
+    payload = {
+        "contents": [
+            {"role": "user", "parts": [{"text": prompt}]}
+        ],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "responseSchema": {
+                "type": "OBJECT",
+                "properties": {
+                    "q": {"type": "STRING"},
+                    "options": {
+                        "type": "ARRAY",
+                        "items": {"type": "STRING"},
+                        "minItems": 4,
+                        "maxItems": 4
+                    },
+                    "answer": {"type": "STRING"}
+                }
+            }
+        }
+    }
+
+    # Get the API key from environment variables
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        print("GEMINI_API_KEY not found in environment variables.")
+        return {"error": "API key is missing"}
+
+    api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={api_key}"
+
+    # Use aiohttp for async HTTP request
+    import aiohttp
+    async with aiohttp.ClientSession() as session:
+        # Implementing exponential backoff
+        for i in range(5):
+            try:
+                async with session.post(api_url, json=payload, headers={'Content-Type': 'application/json'}) as response:
+                    response.raise_for_status()
+                    result = await response.json()
+
+                    if result.get("candidates") and result["candidates"][0].get("content") and result["candidates"][0]["content"].get("parts"):
+                        json_string = result["candidates"][0]["content"]["parts"][0]["text"]
+                        return json.loads(json_string)
+                    else:
+                        raise ValueError("Unexpected API response format")
+
+            except (aiohttp.client_exceptions.ClientError, ValueError) as e:
+                print(f"Attempt {i+1} failed: {e}")
+                await asyncio.sleep(2 ** i) # Exponential backoff
+        return {"error": "Failed to generate question after multiple retries"}
+
+
+def generate_sat_question():
+    """A blocking wrapper for the async function."""
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        # No event loop is running, so create a new one for this thread
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    return loop.run_until_complete(_generate_sat_question_async())
+
+
+# Serve practice page
+@app.route("/practice")
+def practice():
+    return render_template("practice.html")
+
+# Return AI question as JSON
+@app.route("/get_question")
+def get_question():
+    # Calling the blocking wrapper
+    question = generate_sat_question()
+    return jsonify(question)
 
 if __name__ == '__main__':
     app.run(debug=True)

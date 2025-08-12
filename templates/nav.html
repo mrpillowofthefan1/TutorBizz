@@ -31,8 +31,8 @@
       <li class="nav-item {% if request.endpoint == 'loggedhome' %}active{% endif %}">
         <a class="nav-link" href="{{ url_for('loggedhome') }}">Home</a>
       </li>
-      <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
-        <a class="nav-link" href="{{ url_for('checkout') }}">Practice</a>
+      <li class="nav-item {% if request.endpoint == 'get_question' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('practice') }}">Practice</a>
       </li>
       <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
         <a class="nav-link" href="{{ url_for('checkout') }}">Checkout</a>

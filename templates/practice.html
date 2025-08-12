@@ -1,10 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>AI SAT Quiz</title>
 </head>
 <body>
+    <h2 id="question">Loading question...</h2>
+    <div id="options"></div>
+    <button onclick="loadQuestion()">Next Question</button>
 
+    <script>
+        async function loadQuestion() {
+            const res = await fetch("/get_question");
+            const data = await res.json();
+
+            document.getElementById("question").textContent = data.q;
+            const optionsDiv = document.getElementById("options");
+            optionsDiv.innerHTML = "";
+            data.options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.textContent = opt;
+                btn.onclick = () => alert(opt === data.answer ? "✅ Correct!" : `❌ Wrong. Answer: ${data.answer}`);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        loadQuestion();
+    </script>
 </body>
 </html>
