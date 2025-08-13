@@ -101,7 +101,7 @@ def register():
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
-            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email))
+            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s, %s)', (username, password, email, "empty"))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
     return render_template('register.html', msg=msg)
@@ -177,11 +177,34 @@ def create_checkout_session():
 @app.route('/session-status', methods=['GET'])
 def session_status():
     session_obj = stripe.checkout.Session.retrieve(request.args.get('session_id'))
-    return jsonify(status=session_obj.status, customer_email=session_obj.customer_details.email)
+    try:
+        paid = False
+        if getattr(session_obj, 'payment_status', None) == 'paid' or getattr(session_obj, 'status', None) == 'complete':
+            paid = True
+        if paid and session.get('loggedin'):
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('UPDATE accounts SET payment = %s WHERE id = %s', ('SAT', session['id']))
+            mysql.connection.commit()
+    except Exception:
+        pass
+    customer_email = None
+    if getattr(session_obj, 'customer_details', None):
+        customer_email = session_obj.customer_details.email
+    return jsonify(status=session_obj.status, payment_status=getattr(session_obj, 'payment_status', None), customer_email=customer_email)
+
+@app.route('/sat-bank')
+def sat_bank():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT payment FROM accounts WHERE id = %s', (session['id'],))
+    account = cursor.fetchone()
+    if account and account['payment'] == 'SAT':
+        return render_template('practice.html')
+    return "Access denied", 403
 
 # ===== AI Question Generator =====
 async def _generate_sat_question_async():
-    """Generates an SAT question using the Gemini API."""
     prompt = """
     Create an SAT-style question with a clear question, four options, and a single correct answer.
     The question should be in one of the SAT subjects: Reading, Writing and Language, or Math.
@@ -209,7 +232,6 @@ async def _generate_sat_question_async():
         }
     }
 
-    # Get the API key from environment variables
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         print("GEMINI_API_KEY not found in environment variables.")
@@ -217,10 +239,8 @@ async def _generate_sat_question_async():
 
     api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={api_key}"
 
-    # Use aiohttp for async HTTP request
     import aiohttp
     async with aiohttp.ClientSession() as session:
-        # Implementing exponential backoff
         for i in range(5):
             try:
                 async with session.post(api_url, json=payload, headers={'Content-Type': 'application/json'}) as response:
@@ -235,30 +255,23 @@ async def _generate_sat_question_async():
 
             except (aiohttp.client_exceptions.ClientError, ValueError) as e:
                 print(f"Attempt {i+1} failed: {e}")
-                await asyncio.sleep(2 ** i) # Exponential backoff
+                await asyncio.sleep(2 ** i)
         return {"error": "Failed to generate question after multiple retries"}
 
-
 def generate_sat_question():
-    """A blocking wrapper for the async function."""
     try:
         loop = asyncio.get_running_loop()
     except RuntimeError:
-        # No event loop is running, so create a new one for this thread
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop.run_until_complete(_generate_sat_question_async())
 
-
-# Serve practice page
 @app.route("/practice")
 def practice():
     return render_template("practice.html")
 
-# Return AI question as JSON
 @app.route("/get_question")
 def get_question():
-    # Calling the blocking wrapper
     question = generate_sat_question()
     return jsonify(question)
 

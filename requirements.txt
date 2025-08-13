@@ -1,3 +1,6 @@
+aiohttp
+flask-mail
+flask-mysqldb
 Flask~=3.1.1
 Flask
 pymongo[srv]
