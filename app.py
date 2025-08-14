@@ -15,18 +15,19 @@ import stripe
 load_dotenv()
 
 stripe.api_key = os.environ['STRIPE_API_KEY']
-YOUR_DOMAIN = 'http://localhost:5000'
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+YOUR_DOMAIN = os.environ.get('APP_BASE_URL', 'http://localhost:5000')
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your_secret_key')
 
-# MySQL Config
+
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = os.environ['DB_NAME']
 
-# Mail Config
+
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'h8642639@gmail.com'
@@ -34,7 +35,7 @@ app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
-# Initialize services
+
 mail = Mail(app)
 mysql = MySQL(app)
 executor = ThreadPoolExecutor(max_workers=4)
@@ -64,6 +65,7 @@ def login():
             session['loggedin'] = True
             session['id'] = account['id']
             session['username'] = account['username']
+            session['payment'] = account.get('payment', 'empty')
             return render_template('lhome.html', msg=username)
         else:
             msg = 'Incorrect username/password!'
@@ -156,7 +158,7 @@ def forgot3():
 def checkout():
     if not session.get('loggedin'):
         return redirect(url_for('login'))
-    return render_template('checkout.html')
+    return render_template('checkout.html', publishable_key=STRIPE_PUBLISHABLE_KEY)
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -176,7 +178,8 @@ def create_checkout_session():
 
 @app.route('/session-status', methods=['GET'])
 def session_status():
-    session_obj = stripe.checkout.Session.retrieve(request.args.get('session_id'))
+    session_id = request.args.get('session_id')
+    session_obj = stripe.checkout.Session.retrieve(session_id)
     try:
         paid = False
         if getattr(session_obj, 'payment_status', None) == 'paid' or getattr(session_obj, 'status', None) == 'complete':
@@ -185,12 +188,23 @@ def session_status():
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('UPDATE accounts SET payment = %s WHERE id = %s', ('SAT', session['id']))
             mysql.connection.commit()
+            session['payment'] = 'SAT'
     except Exception:
         pass
+
     customer_email = None
     if getattr(session_obj, 'customer_details', None):
         customer_email = session_obj.customer_details.email
-    return jsonify(status=session_obj.status, payment_status=getattr(session_obj, 'payment_status', None), customer_email=customer_email)
+
+    return jsonify(
+        status=getattr(session_obj, 'status', None),
+        payment_status=getattr(session_obj, 'payment_status', None),
+        customer_email=customer_email
+    )
+
+@app.route('/return.html')
+def return_html():
+    return render_template('return.html')
 
 @app.route('/sat-bank')
 def sat_bank():
@@ -201,9 +215,8 @@ def sat_bank():
     account = cursor.fetchone()
     if account and account['payment'] == 'SAT':
         return render_template('practice.html')
-    return "Access denied", 403
+    return redirect(url_for('checkout'))
 
-# ===== AI Question Generator =====
 async def _generate_sat_question_async():
     prompt = """
     Create an SAT-style question with a clear question, four options, and a single correct answer.
@@ -240,10 +253,10 @@ async def _generate_sat_question_async():
     api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={api_key}"
 
     import aiohttp
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session_http:
         for i in range(5):
             try:
-                async with session.post(api_url, json=payload, headers={'Content-Type': 'application/json'}) as response:
+                async with session_http.post(api_url, json=payload, headers={'Content-Type': 'application/json'}) as response:
                     response.raise_for_status()
                     result = await response.json()
 
@@ -253,8 +266,7 @@ async def _generate_sat_question_async():
                     else:
                         raise ValueError("Unexpected API response format")
 
-            except (aiohttp.client_exceptions.ClientError, ValueError) as e:
-                print(f"Attempt {i+1} failed: {e}")
+            except (aiohttp.client_exceptions.ClientError, ValueError):
                 await asyncio.sleep(2 ** i)
         return {"error": "Failed to generate question after multiple retries"}
 
@@ -268,10 +280,17 @@ def generate_sat_question():
 
 @app.route("/practice")
 def practice():
-    return render_template("practice.html")
+    return redirect(url_for('sat_bank'))
 
 @app.route("/get_question")
 def get_question():
+    if not session.get('loggedin'):
+        return jsonify({"error": "Not logged in"}), 401
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT payment FROM accounts WHERE id = %s', (session['id'],))
+    account = cursor.fetchone()
+    if not account or account['payment'] != 'SAT':
+        return jsonify({"error": "Payment required"}), 403
     question = generate_sat_question()
     return jsonify(question)
 
