@@ -280,7 +280,7 @@ def generate_sat_question():
 
 @app.route("/practice")
 def practice():
-    return redirect(url_for('sat_bank'))
+    return redirect(url_for('practice'))
 
 @app.route("/get_question")
 def get_question():
