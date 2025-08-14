@@ -24,41 +24,37 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
-   <div class="collapse navbar-collapse" id="navbarNav">
+  <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ml-auto">
 
       {% if session.get('loggedin') %}
-        <li class="nav-item {% if request.endpoint == 'loggedhome' %}active{% endif %}">
-          <a class="nav-link" href="{{ url_for('loggedhome') }}">Home</a>
-        </li>
-
-        {% if session.get('payment') == 'SAT' %}
-          <li class="nav-item {% if request.endpoint in ['sat_bank','practice'] %}active{% endif %}">
-            <a class="nav-link" href="{{ url_for('sat_bank') }}">SAT Bank</a>
-          </li>
-        {% else %}
-          <li class="nav-item {% if request.endpoint == 'checkout' %}active{% endif %}">
-            <a class="nav-link" href="{{ url_for('checkout') }}">Checkout</a>
-          </li>
-        {% endif %}
-
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
-        </li>
+      <li class="nav-item {% if request.endpoint == 'loggedhome' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('loggedhome') }}">Home</a>
+      </li>
+      <li class="nav-item {% if request.endpoint == 'get_question' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('practice') }}">Practice</a>
+      </li>
+      <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('checkout') }}">Checkout</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+      </li>
       {% else %}
-        <li class="nav-item {% if request.endpoint == 'homepage' %}active{% endif %}">
-          <a class="nav-link" href="{{ url_for('homepage') }}">Home</a>
-        </li>
-        <li class="nav-item {% if request.endpoint == 'login' %}active{% endif %}">
-          <a class="nav-link" href="{{ url_for('login') }}">Sign In</a>
-        </li>
-        <li class="nav-item {% if request.endpoint == 'register' %}active{% endif %}">
-          <a class="nav-link" href="{{ url_for('register') }}">Create Account</a>
-        </li>
-        <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
-          <a class="nav-link" href="{{ url_for('forgot') }}">Reset Password</a>
-        </li>
+      <li class="nav-item {% if request.endpoint == 'homepage' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('homepage') }}">Home</a>
+      </li>
+      <li class="nav-item {% if request.endpoint == 'login' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('login') }}">Sign In</a>
+      </li>
+      <li class="nav-item {% if request.endpoint == 'register' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('register') }}">Create Account</a>
+      </li>
+      <li class="nav-item {% if request.endpoint == 'forgot' %}active{% endif %}">
+        <a class="nav-link" href="{{ url_for('forgot') }}">Reset Password</a>
+      </li>
       {% endif %}
+
     </ul>
   </div>
 </nav>
