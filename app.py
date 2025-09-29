@@ -26,7 +26,7 @@ app.config['MYSQL_HOST'] = os.environ['MYSQL_HOST']
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = os.environ['MYSQL_PASSWORD']
 app.config['MYSQL_DB'] = os.environ['DB_NAME']
-app.config['MYSQL_PORT'] = 3306
+app.config['MYSQL_PORT'] = 28682
 
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
