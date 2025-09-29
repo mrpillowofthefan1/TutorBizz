@@ -22,10 +22,11 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your_secret_key')
 
 
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = os.environ['MYSQL_HOST']
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_PASSWORD'] = os.environ['MYSQL_PASSWORD']
 app.config['MYSQL_DB'] = os.environ['DB_NAME']
+app.config['MYSQL_PORT'] = 3306
 
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
