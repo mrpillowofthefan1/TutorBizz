@@ -28,7 +28,6 @@ app.config['MYSQL_PASSWORD'] = os.environ['MYSQL_PASSWORD']
 app.config['MYSQL_DB'] = os.environ['DB_NAME']
 app.config['MYSQL_PORT'] = 28682
 
-
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'h8642639@gmail.com'
@@ -36,10 +35,10 @@ app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
-
 mail = Mail(app)
 mysql = MySQL(app)
 executor = ThreadPoolExecutor(max_workers=4)
+
 
 @app.route('/')
 def home():
@@ -218,6 +217,13 @@ def sat_bank():
         return render_template('practice.html')
     return redirect(url_for('checkout'))
 
+@app.route("/practice")
+def practice():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    return render_template("practice.html")
+
+
 async def _generate_sat_question_async():
     prompt = """
     Create an SAT-style question with a clear question, four options, and a single correct answer.
@@ -248,7 +254,6 @@ async def _generate_sat_question_async():
 
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        print("GEMINI_API_KEY not found in environment variables.")
         return {"error": "API key is missing"}
 
     api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={api_key}"
@@ -278,10 +283,6 @@ def generate_sat_question():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop.run_until_complete(_generate_sat_question_async())
-
-@app.route("/practice")
-def practice():
-    return redirect(url_for('practice'))
 
 @app.route("/get_question")
 def get_question():
